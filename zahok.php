@@ -11,6 +11,8 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 require_once plugin_dir_path(__FILE__) . 'options/admin-options.php';
+require_once plugin_dir_path(__FILE__) . 'inc/wc/order-ui.php';
+require_once plugin_dir_path(__FILE__) . 'inc/wc/wc-actions.php';
 define('ZAHOK_URL','http://127.0.0.1:8000');
 function zahok_init() {
 	
@@ -31,7 +33,6 @@ add_action('admin_menu', function(){
 add_action('admin_init', 'zahok_admin_init');
 
 function zahok_admin_init() {
-    
     /*
     register_setting(
         'zahok_settings_group',
@@ -40,3 +41,27 @@ function zahok_admin_init() {
     */
     
 }
+
+function zahok_enqueue_script($hook) {
+    // Load the script only on specific admin pages if needed
+    /*
+    if ('zahok' !== $hook) {
+        return;
+    }
+    */
+    wp_enqueue_style('magnific-popup_style',plugin_dir_url( __FILE__ ) . 'assets/js/magnific/magnific-popup.css');
+    wp_enqueue_style('zahok_main_style',plugin_dir_url( __FILE__ ) . 'assets/css/main.css');
+    wp_enqueue_script('magnific-popup',plugin_dir_url( __FILE__ ) . 'assets/js/magnific/jquery.magnific-popup.min.js',['jquery'],null,true);
+    wp_register_script('zahok_main', plugin_dir_url( __FILE__ ) . 'assets/js/main.js', array('jquery','magnific-popup'), '1.0',true);
+    wp_localize_script(
+        'zahok_main',
+        'zahok',
+        [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            //'nonce'    => wp_create_nonce('my_custom_nonce'),
+        ]
+    );
+    
+    wp_enqueue_script('zahok_main');
+}
+add_action('admin_enqueue_scripts', 'zahok_enqueue_script');
