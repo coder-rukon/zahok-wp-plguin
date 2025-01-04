@@ -12,12 +12,18 @@ function zahok_order_admin_col($columns) {
     return $new_columns;
 }
 add_filter('manage_woocommerce_page_wc-orders_columns', 'zahok_order_admin_col');
-
+add_filter('manage_edit-shop_order_columns', 'zahok_order_admin_col', 20);
 
 
 function zahok_admin_col_view( $column_name, $order ){ // WC_Order object is available as $order variable here
 
 	if( 'zahok' === $column_name ) {
+	    if ( $order instanceof WC_Order ) {
+            // This is a WC_Order object
+            echo 'This is an instance of WC_Order.';
+        } else {
+            $order = wc_get_order( $order );
+        }
 		?>
         <div class="zahok_btn_group">
             <button type="button" data-order-id="<?php echo $order->get_id(); ?>" class="button btn_zahok_customer_check">Check Customer</button>
@@ -27,7 +33,7 @@ function zahok_admin_col_view( $column_name, $order ){ // WC_Order object is ava
 	}
 }
 add_action( 'manage_woocommerce_page_wc-orders_custom_column', 'zahok_admin_col_view', 25, 2 );
-
+add_action('manage_shop_order_posts_custom_column', 'zahok_admin_col_view', 20, 2);
 
 add_action('woocommerce_admin_order_data_after_billing_address', 'zahok_order_details_widget_in_admin', 10, 1);
 
